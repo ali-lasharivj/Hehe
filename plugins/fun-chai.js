@@ -39,3 +39,41 @@ async (conn, mek, m, { from, reply }) => {
         reply(`❌ *Error!* ${e.message}`);
     }
 });
+
+
+cmd({
+    pattern: "sadgirl",
+    desc: "Create a sadgirl text effect",
+    category: "logo",
+    react: "🎨",
+    filename: __filename
+}, async (conn, mek, m, { from, args, reply }) => {
+    try {
+        if (!args.length) {
+            return reply("❌ Please provide a name. Example: sadgirl Empire");
+        }
+        
+        const name = args.join(" ");
+        
+        // API URL with user-provided name
+        const apiUrl = `https://api-pink-venom.vercel.app/api/logo?url=https://en.ephoto360.com/write-text-on-wet-glass-online-589.html&name=${encodeURIComponent(name)}`;
+
+        // Fetch JSON response
+        const result = await fetchJson(apiUrl);
+
+        // Check if the download_url is present
+        if (!result?.result?.download_url) {
+            return;
+        }
+
+        // Send the 3D Comic-style text effect image
+        await conn.sendMessage(from, {
+            image: {
+                url: result.result.download_url
+            }
+        });
+
+    } catch (e) {
+        return reply(`*An error occurred while processing your request.*\n\n_Error:_ ${e.message}`);
+    }
+});

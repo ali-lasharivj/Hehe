@@ -17,12 +17,12 @@ cmd({
   category: "owner",
   react: "🛡️",
   filename: __filename
-}, async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+}, async (conn, mek, m, { from, l, quoted, isCreator, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
   try {
     // Check for group, bot admin, and user admin permissions
     if (!isGroup) return reply('This command can only be used in a group.');
     if (!isBotAdmins) return reply('*📛 ι ɴєє∂ тσ вє αɴ α∂мιɴ тσ ᴜѕє тнιѕ ᴄσммαɴ∂.*');
-    if (!isAdmins) return reply('*📛 σɴℓʏ gʀσᴜᴘ α∂мιɴs σʀ тнє σωɴєʀ ᴄαɴ ᴜsє тнιѕ ᴄσммαɴ∂.*');
+    if (!isCreator && !isAdmins) return reply('*📛 σɴℓʏ gʀσᴜᴘ α∂мιɴs σʀ тнє σωɴєʀ ᴄαɴ ᴜsє тнιѕ ᴄσммαɴ∂.*');
 
     const currentMode =
       config.ANTI_LINK_KICK === "true"
@@ -36,7 +36,7 @@ cmd({
     const text = `*⌈ ీ𝐀𝐍𝐓𝐈-𝐋𝐈𝐍𝐊 𝐂𝐌𝐃 𝐆𝐔𝐈𝐃𝐄ీ ⌋*\n‎*╭──────────────────✑*\n‎*┋* ⬡ ☇ *¢ᴜʀʀєɴᴛ мσ∂є:${currentMode}*\n‎*┋* *⬡ 𝟏: αɴтι-ℓιɴк ωαʀɴ*\n‎*┋* *⬡ 𝟐: αɴтι-ℓιɴк ∂єℓєтє*\n*┋* *⬡ 𝟑: αɴтι-ℓιɴк кι¢к*\n‎*┋* *⬡ 𝟒: αɴтι-ℓιɴк αℓℓ ∂ιѕαвℓє∂*\n‎*╰──────────────────✑*\n> *© ᴘσωєʀє∂ ву αℓι м∂⎯꯭̽💀🐍*`;
 
     const sentMsg = await conn.sendMessage(from, {
-      image: { url: "https://files.catbox.moe/33hd05.jpg" },
+      image: { url: "https://qu.ax/zrqFX.jpg" },
       caption: text
     }, { quoted: mek });
 

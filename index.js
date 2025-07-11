@@ -83,6 +83,7 @@ console.error = (...args) => {
   const mode = config.MODE
   const online = config.ALWAYS_ONLINE
   const status = config.AUTO_STATUS_SEEN
+  const reaction = config.AUTO_STATUS_REACT
   const ownerNumber = ['923003588997']
 
   //=============================================
@@ -224,35 +225,59 @@ conn.ev.on('connection.update', async (update) => {
             console.log('Plugins installed successfully ✅');
 
     try {
-      const upMessage = `*𝐇𝐄𝐋𝐋𝐎 𝐓𝐇𝐄𝐑𝐄 𝐀𝐋𝐈-𝐌𝐃 𝐁𝐎𝐓👑*
-*𝐂𝐎𝐍𝐍𝐄𝐂𝐓𝐄𝐃 𝐒𝐔𝐂𝐂𝐄𝐒𝐒𝐅𝐔𝐋𝐋𝐘!*
-  
-*╭───━━━━───━━━━──┉┈⚆*
+		// const username = config.REPO.split('/').slice(3, 4)[0];
+ const botname = "—˹𝐀ɭīī "; //add your name
+ const ownername = "𝐒ʊ̊𝐏𝐏๏፝֟ɼʈ⎯꯭̽💀🇦🇱"; // add your name
+ const ali = { 
+ key: { 
+  remoteJid: 'status@broadcast', 
+  participant: '0@s.whatsapp.net' 
+   }, 
+message:{ 
+  newsletterAdminInviteMessage: { 
+    newsletterJid: '120363318387454868@newsletter', //add your channel jid
+    newsletterName: "𝐈𝐂𝐘 𝐁𝐎𝐓", //add your bot name
+    caption: botname + ` 𝐌Ɗ ` + ownername, 
+    inviteExpiration: 0
+  }
+ }
+}
+			
+			
+			
+	     const username = `itx-alii-raza`;
+             const mrfrank = `https://github.com/${username}`;
+	
+                    const upMessage = `*𝐂𝐎𝐍𝐍𝐄𝐂𝐓𝐄𝐃 𝐒𝐔𝐂𝐂𝐄𝐒𝐒𝐅𝐔𝐋𝐋𝐘!*
+*╭───────────────────✑*
 *│• 𝐓𝐘𝐏𝐄 .𝐌𝐄𝐍𝐔 𝐓𝐎 𝐒𝐄𝐄 𝐋𝐈𝐒𝐓 •*
 *│• 𝐁𝐎𝐓 𝐀𝐌𝐀𝐙𝐈𝐍𝐆 𝐅𝐄𝐀𝐓𝐔𝐑𝐄𝐒 •*
-*│• 🌸𝐃𝐄𝐕𝐄𝐋𝐎𝐏𝐄𝐑 : 𝐀ɭīī 𝐈ƞ̄x̷īīɖ𝛆̽*
-*│• ⏰𝐀𝐋𝐖𝐀𝐘𝐒 𝐎𝐍𝐋𝐈𝐍𝐄 : ${online}*
-*│• 📜𝐏𝐑𝐄𝐅𝐈𝐗 : ${prefix}*
-*│• 🪾𝐌𝐎𝐃𝐄 : ${mode}*
-*│• 🪄𝐒𝐓𝐀𝐓𝐔𝐒 𝐕𝐈𝐄𝐖𝐒 : ${status}*
-*│• 🫟𝐕𝐄𝐑𝐒𝐈𝐎𝐍 : 𝟒.𝟎.𝟎*
-*┗───━━━━───━━━━──┉┈⚆*`;
+*│• 🌸𝐃𝐄𝐕𝐄𝐋𝐎𝐏𝐄𝐑: 𝐀ɭīī 𝐗𝐃 𝟔𝐓𝟗*
+*│• ⏰𝐀𝐋𝐖𝐀𝐘𝐒 𝐎𝐍𝐋𝐈𝐍𝐄: ${online}*
+*│• 📜𝐏𝐑𝐄𝐅𝐈𝐗: ${prefix}*
+*│• 🪾𝐌𝐎𝐃𝐄: ${mode}*
+*│• 🪄𝐒𝐓𝐀𝐓𝐔𝐒 𝐕𝐈𝐄𝐖𝐒: ${status}*
+*│• 🫟𝐒𝐓𝐀𝐓𝐔𝐒 𝐑𝐄𝐀𝐂𝐓: ${reaction}*
+‎*╰───────────────────✑*`;
+                    
+                    await conn.sendMessage(conn.user.id, { 
+                        image: { url: config.ALIVE_IMG || 'https://files.catbox.moe/6ku0eo.jpg' }, 
+			ai: true,
+                        caption: upMessage},{
+			quoted: ali
+                    });
+		
 
-      await conn.sendMessage(conn.user.id, {
-        image: { url: `https://i.ibb.co/LDLMs949/lordali.jpg` },
-        caption: upMessage
-      });
+                    
+                } catch (sendError) {
+                    console.error('[❄️] Error sending messages:', sendError);
+                }
+            }
 
-    } catch (sendError) {
-      console.error('❌ Error sending startup message:', sendError);
-    }
-  }
-
-  if (qr) {
-    console.log('Scan the QR code to connect or use session ID');
-    qrcode.generate(qr, { small: true });
-  }
-});
+        if (qr) {
+            console.log('[❄️] Scan the QR code to connect or use session ID');
+        }
+    });
 
     conn.ev.on('creds.update', saveCreds);
     

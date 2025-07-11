@@ -1,80 +1,85 @@
-const config = require('../config');
 const { cmd, commands } = require('../command');
-const { runtime } = require('../lib/functions');
-const axios = require('axios');
-
-function isEnabled(value) {
-    // Function to check if a value represents a "true" boolean state
-    return value && value.toString().toLowerCase() === "true";
-}
+const config = require('../config');
+const prefix = config.PREFIX;
 
 cmd({
-    pattern: "env",
-    alias: ["setting", "allvar"],
-    desc: "Settings of bot",
-    category: "menu",
-    react: "⤵️",
+    pattern: "allvar",
+    react: "🎐",
+    alias: ["setting" ,"settings"],
+    desc: "cheack uptime",
+    category: "info",
     filename: __filename
-}, 
-async (conn, mek, m, { from, quoted, reply }) => {
-    try {
-        // Define the settings message with the correct boolean checks
-        let envSettings = `╭━━━〔 *𓆩ု᪳𝐀𝐋𝐈-𝐌𝐃ှ᪳𓆪* 〕━━┈⊷
-┃▸╭───────────···๏
-┃▸├❒ *⚙️ENV SETTINGS⚙️*
-┃▸└───────────···๏
-╰────────────────┈⊷
-╭━━〔 *Enabled Disabled* 〕━┈⊷
-├❒ *Status View:* ${isEnabled(config.AUTO_STATUS_SEEN) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Status Reply:* ${isEnabled(config.AUTO_STATUS_REPLY) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Auto Reply:* ${isEnabled(config.AUTO_REPLY) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Auto Sticker:* ${isEnabled(config.AUTO_STICKER) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Auto Voice:* ${isEnabled(config.AUTO_VOICE) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Custom Reacts:* ${isEnabled(config.CUSTOM_REACT) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Auto React:* ${isEnabled(config.AUTO_REACT) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Anti-Link:* ${isEnabled(config.ANTI_LINK) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Anti-Bad Words:* ${isEnabled(config.ANTI_BAD) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Auto Typing:* ${isEnabled(config.AUTO_TYPING) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Auto Recording:* ${isEnabled(config.AUTO_RECORDING) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Always Online:* ${isEnabled(config.ALWAYS_ONLINE) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Status React:* ${isEnabled(config.AUTO_STATUS_REACT) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Public Mode:* ${isEnabled(config.PUBLIC_MODE) ? "Enabled ✅" : "Disabled ❌"}
-├❒ *Read Message:* ${isEnabled(config.READ_MESSAGE) ? "Enabled ✅" : "Disabled ❌"}
-╰━━━━━━━━━━━━──┈⊷
-> ${config.DESCRIPTION}`;
-
-        // Send message with an image
-        await conn.sendMessage(
-            from,
-            {
-                image: { url: 'https://cdn.ironman.my.id/i/2du3i5.jpg' }, // Image URL
-                caption: envSettings,
-                contextInfo: {
-                    mentionedJid: [m.sender],
-                    forwardingScore: 999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363318387454868@newsletter',
-                        newsletterName: "𝐀ɭīī 𝐌Ɗ 𝐒ʊ̊𝐏𝐏๏፝֟ɼʈ  ⃪🤖͎᪳᪳𝆺𝅥",
-                        serverMessageId: 143
-                    }
-                }
-            },
-            { quoted: mek }
-        );
-
-               // Send an audio file
-        await conn.sendMessage(from, {
-            audio: { url: 'https://cdn.ironman.my.id/i/hmxjch.mp4' }, // Audio URL
-            mimetype: 'audio/mp4',
-            ptt: true
-        }, { quoted: mek });
-
-    } catch (error) {
-        console.log(error);
-        reply(`Error: ${error.message}`);
+},
+async(conn, mek, m,{from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
+try{
+let status = `*⚙️ \`BOT-SETTINGS\` ⚙️*
+‎*╭──────────────────✑*
+‎*┋ \`MODE ${config.MODE || "public"}*
+‎*┋ υѕαgє: ${config.PREFIX}mode private/public*
+‎*┋ \`AUTO-TYPING ${config.AUTO_TYPING || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αυтσтуριɴg σɴ/σff*
+‎*┋ \`ALWAYS-ONLINE ${config.ALWAYS_ONLINE || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αℓωαуѕσɴℓιɴє σɴ/σff*
+‎*┋ \`AUTO-RECORDING ${config.AUTO_RECORDING || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αυтσʀєᴄσʀ∂ιɴg σɴ/σff*
+‎*┋ \`STATUS-REACTION ${config.AUTO_STATUS_REACT || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}statusreact on/off*
+‎*┋ \`BAD-WORD ${config.ANTI_BAD_WORD || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αɴтιвα∂ σɴ/σff*
+‎*┋ \`ANTI-DELETE ${config.ANTI_DELETE || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αɴтι∂єℓєтє σɴ/σff*
+‎*┋ \`AUTO-STICKER ${config.AUTO_STICKER || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αυтσѕтιᴄкєʀ σɴ/σff*
+‎*┋ \`AUTO-REPLY ${config.AUTO_REPLY || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αυтσʀєρℓу σɴ/σff*
+‎*┋ \`AUTO-REACT ${config.AUTO_REACT || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αυтσʀєαᴄт σɴ/σff*
+‎*┋ \`STATUS-REPLY ${config.AUTO_STATUS_REPLY || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αυтσѕтαтυѕʀєρℓу σɴ/σff*
+‎*┋ \`ANTI LINK ${config.ANTI_LINK_KICK || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αɴтιℓιɴк <σρтισɴ>*
+‎*┋ \`OWNER-REACT ${config.OWNER_REACT || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}σωɴєʀʀєαᴄт σɴ/σff
+‎*┋ \`ANTI-CALL ${config.ANTI_CALL || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}αɴтιᴄαℓℓ σɴ/σff*
+‎*┋ \`ADMIN-STATUS ${config.ADMIN_STATUS || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}α∂мιɴ-ѕтαтυѕ σɴ/σff*
+‎*┋ \`WEL-COME ${config.WELCOME || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}ωєℓᴄσмє σɴ/σff*
+‎*┋ \`GOOD-BYE ${config.GOODBYE || "off"}\`*
+‎*┋ υѕαgє: ${config.PREFIX}gσσ∂вує σɴ/σff*
+*╰──────────────────✑*
+*📍ɴσтє: ʀєρℓα¢є \`"σɴ/σff"\` ωιтн тнє ∂єѕιʀє∂ ѕтαтє тσ єɴαвℓє σʀ ∂ιѕαвℓє α fєαтυʀє.*
+`
+if (!config.ALIVE_IMG.includes('mp4')) {
+await conn.sendMessage(from,{image:{url: config.ALIVE_IMG},caption:status,
+                             contextInfo: {
+    mentionedJid: [m.sender],
+    forwardingScore: 999,
+    isForwarded: true,
+    forwardedNewsletterMessageInfo: {
+      newsletterJid: '120363318387454868@newsletter',
+      newsletterName: config.BOT_NAME,
+      serverMessageId: 999
     }
-});
-
-
-   
+  }
+}, { quoted: mek });
+} else {
+await conn.sendMessage(from,{video:{url: config.ALIVE_IMG},caption:status,
+                             contextInfo: {
+    mentionedJid: [m.sender],
+    forwardingScore: 999,
+    isForwarded: true,
+    forwardedNewsletterMessageInfo: {
+      newsletterJid: '120363318387454868@newsletter',
+      newsletterName: config.BOT_NAME,
+      serverMessageId: 999
+    }
+  }
+}, { quoted: mek });
+}
+} catch (e) {
+console.log(e)
+reply(`${e}`)
+}
+})

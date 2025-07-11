@@ -357,7 +357,7 @@ async (conn, mek, m, { from, pushname: _0x1279c5, reply }) => {
 ‎*╰──────────────────✑*`;
 
         await conn.sendMessage(from, {
-            image: { url: config.MENU_IMAGE_URL || 'https://qu.ax/zrqFX.jpg' }, 
+            image: { url: config.ALIVE_IMG || 'https://qu.ax/zrqFX.jpg' }, 
             caption: menuText.trim(),
             contextInfo: {
                 mentionedJid: [m.sender],
@@ -370,7 +370,9 @@ async (conn, mek, m, { from, pushname: _0x1279c5, reply }) => {
         }
       }
     }, { quoted: mek });
-    
+    await conn.sendMessage(from, {
+            react: { text: "✅", key: m.key }
+        });
 
   } catch (e) {
     console.error("❌ Error in menu:", e);

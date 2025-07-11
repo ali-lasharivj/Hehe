@@ -14,7 +14,7 @@ async(conn, mek, m,{from, quoted, body, isCmd, command, args, q, isGroup, sender
 try{
 let status = `*⚙️ \`BOT-SETTINGS\` ⚙️*
 ‎*╭──────────────────✑*
-‎*┋ \`MODE ${config.MODE || "public"}*
+‎*┋ \`MODE ${config.MODE || "public"}\`*
 ‎*┋ υѕαgє: ${config.PREFIX}mode private/public*
 ‎*┋ \`AUTO-TYPING ${config.AUTO_TYPING || "off"}\`*
 ‎*┋ υѕαgє: ${config.PREFIX}αυтσтуριɴg σɴ/σff*
@@ -39,7 +39,7 @@ let status = `*⚙️ \`BOT-SETTINGS\` ⚙️*
 ‎*┋ \`ANTI LINK ${config.ANTI_LINK_KICK || "off"}\`*
 ‎*┋ υѕαgє: ${config.PREFIX}αɴтιℓιɴк <σρтισɴ>*
 ‎*┋ \`OWNER-REACT ${config.OWNER_REACT || "off"}\`*
-‎*┋ υѕαgє: ${config.PREFIX}σωɴєʀʀєαᴄт σɴ/σff
+‎*┋ υѕαgє: ${config.PREFIX}σωɴєʀʀєαᴄт σɴ/σff*
 ‎*┋ \`ANTI-CALL ${config.ANTI_CALL || "off"}\`*
 ‎*┋ υѕαgє: ${config.PREFIX}αɴтιᴄαℓℓ σɴ/σff*
 ‎*┋ \`ADMIN-STATUS ${config.ADMIN_STATUS || "off"}\`*

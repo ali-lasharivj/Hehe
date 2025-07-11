@@ -1,39 +1,85 @@
+const axios = require("axios");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const FormData = require("form-data");
+const config = require('../config');
+const { cmd, commands } = require('../command');
+const moment = require("moment");
+let botStartTime = Date.now(); // Recording the start time of the bot
 
-
-
-
-
-
-const config = require('../config')
-const {cmd , commands} = require('../command')
-const os = require("os")
-const {runtime} = require('../lib/functions')
 cmd({
-    pattern: "system",
-    react: "♠️",
+    pattern: "runtime",
+    desc: "Check bot online or no.",
+    react: "🌸",
     alias: ["uptime" ,"runtime"],
-    desc: "cheack uptime",
-    category: "main",
+    category: "info",
     filename: __filename
 },
-async(conn, mek, m,{from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-try{
-let status = `*╭──────────●●►*
-*ALI_MD-V4 UPTIME LIST↷*
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        // Variables
+        const name = pushname || conn.getName(sender);
+        const murl = 'https://whatsapp.com/channel/0029Vaan9TF9Bb62l8wpoD47';
+        const img = 'https://i.imgur.com/vTs9acV.jpeg';
+        const now = new Date();
+        const time = now.toLocaleTimeString("en-US", { hour12: true, timeZone: "Asia/Karachi" });
+        const date = now.toLocaleDateString("en-CA", { timeZone: "Asia/Karachi" });
+        const runtimeMilliseconds = Date.now() - botStartTime;
+        const runtimeSeconds = Math.floor((runtimeMilliseconds / 1000) % 60);
+        const runtimeMinutes = Math.floor((runtimeMilliseconds / (1000 * 60)) % 60);
+        const runtimeHours = Math.floor(runtimeMilliseconds / (1000 * 60 * 60));
 
-*_UPTIME:➠_*  ${runtime(process.uptime())}
+        const formattedInfo = `
+👤 *ʜᴇʏ* ${pushname}
+🕒 *ᴛɪᴍᴇ*: *${time}*
+📅 *ᴅᴀᴛᴇ*: *${date}*
+⏳ *ᴜᴘᴛɪᴍᴇ*: *${runtimeHours} ʜᴏᴜʀs, ${runtimeMinutes} ᴍɪɴᴜᴛᴇs, ${runtimeSeconds} sᴇᴄᴏɴᴅs*
+`.trim();
 
-*_RAM USAGE:➠_* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(require('os').totalmem / 1024 / 1024)}MB
+        // Constructing the contact message
+        const con = {
+            key: {
+                fromMe: false,
+                participant: `${sender.split('@')[0]}@s.whatsapp.net`,
+                ...(isGroup ? { remoteJid: '923003588997@s.whatsapp.net' } : {}),
+            },
+            message: {
+                contactMessage: {
+                    displayName: name,
+                    vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:${name}\nitem1.TEL;waid=${sender.split('@')[0]}:${sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
+                },
+            },
+        };
 
-*_HOSTNAME:➠_* ${os.hostname()}
+        // Text message with context info
+        const message = {
+            text: formattedInfo,
+            contextInfo: {
+                forwardingScore: 1,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: '120363318387454868@newsletter',
+                    newsletterName: '—˹𝐀ɭīī 𝐌Ɗ 𝐒ʊ̊𝐏𝐏๏፝֟ɼʈ⎯꯭̽💀🚩',
+                    serverMessageId: -1
+                },
+                mentionedJid: [sender],
+                externalAdReply: {
+                    title: config.BOT_NAME || 'ALI-MD 🥀',
+                    body: config.DESCRIPTION || 'POWERED BY ALI INXIDE 🤌💗',
+                    thumbnailUrl: config.ALIVE_IMG || 'https://files.catbox.moe/6ku0eo.jpg',
+                    sourceUrl: murl,
+                    mediaType: 1,
+                    renderLargerThumbnail: true,
+                },
+            }
+        };
 
-*_OWNER:➠_* *𓆩ု᪳𝐀𝐋𝐈 𝐈𝐍𝅦𝐒i͜͡𝐃𝐄ှ᪳𓆪*
-*╰──────────●●►*
-`
-await conn.sendMessage(from,{image:{url:config.ALIVE_IMG},caption:`${status}`},{quoted:mek})
+        // Send the message
+        await conn.sendMessage(from, message, { quoted: con });
 
-}catch(e){
-console.log(e)
-reply(`${e}`)
-}
-})
+    } catch (e) {
+        console.log(e);
+        reply(`${e}`);
+    }
+});

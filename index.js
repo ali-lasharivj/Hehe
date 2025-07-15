@@ -72,6 +72,7 @@ console.error = (...args) => {
   const { sms, downloadMediaMessage, AntiDelete } = require('./lib')
   const { registerAntiNewsletter } = require('./plugins/antinewsletter')
   const { updateActivity } = require('./lib/activity')
+const { PresenceControl, BotActivityFilter } = require('./data/presence');
   const { registerGroupMessages } = require('./plugins/groupMessages')
   const FileType = require('file-type');
   const { File } = require('megajs')
@@ -410,7 +411,14 @@ conn.ev.on('messages.upsert', async (msg) => {
 registerGroupMessages(conn);
 
 registerAntiNewsletter(conn);
-           
+     
+// always Online 
+
+conn.ev.on("presence.update", (update) => PresenceControl(conn, update));
+
+	
+BotActivityFilter(conn);	
+	      
 	
 	
  /// READ STATUS       

@@ -12,7 +12,7 @@ cmd({
   'react': "🎨",
   'alias':"randomcolour",
   'desc': "Generate a random color with name and code.",
-  'category': "utility",
+  'category': "fan-games",
   'filename': __filename
 }, async (_0xdb9b4f, _0x1dc91a, _0x232196, {
   reply: _0x82e9b2
@@ -31,7 +31,7 @@ cmd({
   'pattern': "binary",
   'react': "🤹‍♂️",
   'desc': "Convert text into binary format.",
-  'category': 'utility',
+  'category': "fan-games",
   'filename': __filename
 }, async (_0x3249b3, _0x7a9df9, _0x3dccce, {
   args: _0x1d50f3,
@@ -55,7 +55,7 @@ cmd({
   'pattern': "dbinary",
   'react': "🧩",
   'desc': "Decode binary string into text.",
-  'category': "utility",
+  'category': "fan-games",
   'filename': __filename
 }, async (_0x5ef941, _0x158713, _0x4b75b0, {
   args: _0x359424,
@@ -79,7 +79,7 @@ cmd({
   'pattern': "encode",
   'react': "🧩",
   'desc': "Encode text into Base64 format.",
-  'category': "utility",
+  'category': "fan-games",
   'filename': __filename
 }, async (_0x4adb24, _0x673c52, _0x53b711, {
   args: _0xc44ee1,
@@ -101,7 +101,7 @@ cmd({
   'pattern': 'decode',
   'react': "🤹‍♂️",
   'desc': "Decode Base64 encoded text.",
-  'category': "utility",
+  'category': "fan-games",
   'filename': __filename
 }, async (_0x1089b2, _0x9b388b, _0x101929, {
   args: _0x4fb23d,
@@ -122,7 +122,7 @@ cmd({
 cmd({
   'pattern': "urlencode",
   'desc': "Encode text into URL encoding.",
-  'category': 'utility',
+  'category': "fan-games",
   'filename': __filename
 }, async (_0x1b66a1, _0x5ea663, _0x4703fd, {
   args: _0x26d2aa,
@@ -143,7 +143,7 @@ cmd({
 cmd({
   'pattern': 'urldecode',
   'desc': "Decode URL encoded text.",
-  'category': "utility",
+  'category': "fan-games",
   'filename': __filename
 }, async (_0xebbefb, _0x141da6, _0x30d208, {
   args: _0x297082,
@@ -164,7 +164,7 @@ cmd({
 cmd({
   'pattern': "roll",
   'desc': "Roll a dice (1-6).",
-  'category': 'fun',
+  'category': "fan-games",
   'filename': __filename
 }, async (_0x52291b, _0x3b2718, _0x263aad, {
   reply: _0x2f786c
@@ -180,7 +180,7 @@ cmd({
 cmd({
   'pattern': "coinflip",
   'desc': "Flip a coin and get Heads or Tails.",
-  'category': "fun",
+  'category': "fan-games",
   'filename': __filename
 }, async (_0x43388c, _0x1f1a6d, _0x11ed37, {
   reply: _0x3ce285
@@ -196,7 +196,7 @@ cmd({
 cmd({
   'pattern': "flip",
   'desc': "Flip the text you provide.",
-  'category': 'fun',
+  'category': "fan-games",
   'filename': __filename
 }, async (_0x2ce830, _0x36a68e, _0x89c2b5, {
   args: _0x4a0544,
@@ -216,7 +216,7 @@ cmd({
 cmd({
   'pattern': "pick",
   'desc': "Pick between two choices.",
-  'category': "fun",
+  'category': "fun-games",
   'filename': __filename
 }, async (_0x3d4e6f, _0x59fa22, _0x231495, {
   args: _0x5915c6,
@@ -236,7 +236,7 @@ cmd({
 cmd({
   'pattern': "timenow",
   'desc': "Check the current local time.",
-  'category': "utility",
+  'category': "search",
   'filename': __filename
 }, async (_0x9a07a0, _0x44fd28, _0x70d7c, {
   reply: _0x2cf87c
@@ -259,7 +259,7 @@ cmd({
 cmd({
   'pattern': 'date',
   'desc': "Check the current date.",
-  'category': "utility",
+  'category': "search",
   'filename': __filename
 }, async (_0x33d0b2, _0x464ab3, _0xa1f520, {
   reply: _0x2f4fd4
@@ -281,7 +281,7 @@ cmd({
 cmd({
   'pattern': 'shapar',
   'desc': "Send shapar ASCII art with mentions.",
-  'category': 'fun',
+  'category': "fan-games",
   'filename': __filename
 }, async (_0x36fc22, _0x5e5045, _0x46ed7e, {
   from: _0x4a95e9,
@@ -417,7 +417,7 @@ cmd({
   'pattern': 'calculate',
   'alias': ['calc'],
   'desc': "Evaluate a mathematical expression.",
-  'category': "utilities",
+  'category': "fan-games",
   'filename': __filename
 }, async (_0x1cbb24, _0x5a22db, _0xb97cd9, {
   args: _0x62506a,
@@ -450,7 +450,7 @@ cmd({
   pattern: "numbergame",
   react: "🎲",
   desc: "Start a number guessing game.",
-  category: "game",
+  category: "fan-games",
   use: ".numbergame",
   filename: __filename,
 }, async (conn, mek, m, { from, reply, isGroup, sender }) => {
@@ -474,7 +474,7 @@ cmd({
   pattern: "guess",
   react: "🤔",
   desc: "Make a guess in the number game.",
-  category: "game",
+  category: "fan-games",
   use: ".guess <number>",
   filename: __filename,
 }, async (conn, mek, m, { from, reply, q, sender }) => {
@@ -508,7 +508,7 @@ cmd({
   pattern: "endgame",
   react: "❌",
   desc: "End the current number game.",
-  category: "game",
+  category: "fan-games",
   use: ".endgame",
   filename: __filename,
 }, async (conn, mek, m, { from, reply }) => {

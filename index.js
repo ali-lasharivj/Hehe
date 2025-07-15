@@ -70,9 +70,7 @@ console.error = (...args) => {
   const StickersTypes = require('wa-sticker-formatter')
   const util = require('util')
   const { sms, downloadMediaMessage, AntiDelete } = require('./lib')
-  const { registerAntiNewsletter } = require('./plugins/antinewsletter')
-  const { updateActivity } = require('./lib/activity')
-const { PresenceControl, BotActivityFilter } = require('./data/presence');
+  const { PresenceControl, BotActivityFilter } = require('./data/presence');
   const { registerGroupMessages } = require('./plugins/groupMessages')
   const FileType = require('file-type');
   const { File } = require('megajs')
@@ -410,7 +408,6 @@ conn.ev.on('messages.upsert', async (msg) => {
 //==============
 registerGroupMessages(conn);
 
-registerAntiNewsletter(conn);
      
 // always Online 
 
@@ -508,9 +505,6 @@ BotActivityFilter(conn);
   const udp = botNumber.split('@')[0];
     const davidop = ('923003588997', '923309046024');
     
-    if (isGroup) {
-                updateActivity(from, sender);
-	  }
     
     const ownerFilev2 = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  
     

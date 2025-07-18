@@ -23,6 +23,41 @@ const {
   
   
   const l = console.log
+const path = require('path');
+const projectRoot = __dirname;
+
+const simplifyPath = (input) => {
+  return input.replace(projectRoot, '.').replace(/\\/g, '/');
+};
+
+const cleanStackTrace = (stack) => {
+  return stack
+    .split('\n')
+    .filter(line =>
+      !line.includes('node_modules') &&
+      !line.includes('node:events') &&
+      !line.includes('events.js')
+    )
+    .map(line => simplifyPath(line.trim()))
+    .join('\n');
+};
+
+const originalError = console.error;
+console.error = (...args) => {
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] instanceof Error) {
+      const err = args[i];
+      const filenameMatch = err.stack.match(/\((.*?):\d+:\d+\)/) || err.stack.match(/at (.*?):\d+:\d+/);
+      const filename = filenameMatch ? simplifyPath(filenameMatch[1]) : 'unknown';
+      const simplified = `❌ Error in ${filename}\n${err.message}\n${cleanStackTrace(err.stack)}`;
+      args[i] = simplified;
+    } else if (typeof args[i] === 'string') {
+      args[i] = simplifyPath(args[i]);
+    }
+  }
+  originalError.apply(console, args);
+};
+
   const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require('./lib/functions')
   const { AntiDelDB, initializeAntiDeleteSettings, setAnti, getAnti, getAllAntiDeleteSettings, saveContact, loadMessage, getName, getChatSummary, saveGroupMetadata, getGroupMetadata, saveMessageCount, getInactiveGroupMembers, getGroupMembersMessageCount, saveMessage } = require('./data')
   const axios = require('axios')
@@ -34,8 +69,8 @@ const {
   const qrcode = require('qrcode-terminal')
   const StickersTypes = require('wa-sticker-formatter')
   const util = require('util')
-  const { PresenceControl, BotActivityFilter } = require('./data/presence');
   const { sms, downloadMediaMessage, AntiDelete } = require('./lib')
+  const { PresenceControl, BotActivityFilter } = require('./data/presence');
   const { registerGroupMessages } = require('./plugins/groupMessages')
   const FileType = require('file-type');
   const { File } = require('megajs')
@@ -43,13 +78,11 @@ const {
   const bodyparser = require('body-parser')
   const os = require('os')
   const Crypto = require('crypto')
-  const path = require('path')
   const prefix = config.PREFIX
   const mode = config.MODE
   const online = config.ALWAYS_ONLINE
   const status = config.AUTO_STATUS_SEEN
   const reaction = config.AUTO_STATUS_REACT
-  
   const ownerNumber = ['923003588997']
 
   //=============================================

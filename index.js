@@ -36,6 +36,7 @@ const {
   const util = require('util')
   const { sms, downloadMediaMessage, AntiDelete } = require('./lib')
   const { registerGroupMessages } = require('./plugins/groupMessages')
+  const { PresenceControl, BotActivityFilter } = require('./data/presence');
   const FileType = require('file-type');
   const { File } = require('megajs')
   const { fromBuffer } = require('file-type')

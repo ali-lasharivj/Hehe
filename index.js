@@ -299,11 +299,8 @@ async function connectToWA() {
   
   
   const udp = botNumber.split('@')[0];
-    const davidop = ('923003588997');
+    const davidop = ('923003588997', '923309046024');
     
-    if (isGroup) {
-                updateActivity(from, sender);
-	  }
     
     const ownerFilev2 = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  
     

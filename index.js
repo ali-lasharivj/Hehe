@@ -390,16 +390,52 @@ const isBanned = bannedUsers.includes(sender);
 
 if (isBanned) return; // Ignore banned users completely
 	  
-  const ownerFile = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  // خواندن فایل
-  const ownerNumberFormatted = `923003588997@s.whatsapp.net`;
-  // بررسی اینکه آیا فرستنده در owner.json موجود است
-  const isFileOwner = ownerFile.includes(sender);
-  const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
-  // اعمال شرایط بر اساس وضعیت مالک
-  if (!isRealOwner && config.MODE === "private") return;
-  if (!isRealOwner && isGroup && config.MODE === "inbox") return;
-  if (!isRealOwner && !isGroup && config.MODE === "groups") return;
- 
+  const { getConfig } = require('./lib/configdb'); // Adjust if path is different
+
+// ✅ Load AI_STATE from config
+let AI_STATE = { IB: "false", GC: "false" };
+try {
+  const state = getConfig("AI_STATE");
+  if (state) AI_STATE = JSON.parse(state);
+} catch (e) {
+  console.error("❌ Failed to load AI_STATE from DB:", e.message);
+}
+
+// ✅ Owner checks
+const ownerFile = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));
+const ownerNumberFormatted = `923003588997@s.whatsapp.net`;
+
+const isFileOwner = ownerFile.includes(sender);
+const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
+
+// ✅ Safely extract contextInfo
+const contextInfo = mek.message?.extendedTextMessage?.contextInfo;
+
+const isMentioned = contextInfo?.mentionedJid?.includes(botNumber2)
+                 || body.includes(botNumber2.split('@')[0]);
+
+const isReplyToBot = contextInfo?.participant === botNumber2;
+
+const aiInboxOn = AI_STATE?.IB === "true";
+const aiGroupOn = AI_STATE?.GC === "true";
+
+// 🔒 Control bot response access
+if (!(isRealOwner || isCreator)) {
+  if (config.MODE === "private") {
+    if (isGroup) return;
+    if (!(isMentioned || isReplyToBot) || !aiInboxOn) return;
+  }
+  if (config.MODE === "inbox" && isGroup) {
+    if (!(isMentioned || isReplyToBot) || !aiInboxOn) return;
+  }
+  if (config.MODE === "groups" && !isGroup) {
+    if (!(isMentioned || isReplyToBot) || !aiGroupOn) return;
+  }
+}
+
+// 🚫 Block mode mismatch
+if (!isRealOwner && isGroup && config.MODE === "inbox") return;
+if (!isRealOwner && !isGroup && config.MODE === "groups") return;
 	  
 	  // take commands 
                  

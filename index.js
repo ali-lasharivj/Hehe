@@ -301,6 +301,99 @@ conn.ev.on('call', async (calls) => {
     console.error("Anti-call error:", err);
   }
 });
+  // =============AUTO-STSTUS-SEND================= 
+  const sendNoPrefix = async (client, message) => {
+  try {
+    if (!message.quoted) {
+      return await client.sendMessage(message.chat, {
+        text: "*🎐 ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ sᴛᴀᴛᴜs!*"
+      }, { quoted: message });
+    }
+
+    const buffer = await message.quoted.download();
+    const mtype = message.quoted.mtype;
+    const options = { quoted: message };
+
+    let messageContent = {};
+    switch (mtype) {
+      case "imageMessage":
+        messageContent = {
+          image: buffer,
+          caption: message.quoted.text || '',
+          mimetype: message.quoted.mimetype || "image/jpeg"
+        };
+        break;
+      case "videoMessage":
+        messageContent = {
+          video: buffer,
+          caption: message.quoted.text || '',
+          mimetype: message.quoted.mimetype || "video/mp4"
+        };
+        break;
+      case "audioMessage":
+        messageContent = {
+          audio: buffer,
+          mimetype: "audio/mp4",
+          ptt: message.quoted.ptt || false
+        };
+        break;
+      default:
+        return await client.sendMessage(message.chat, {
+          text: "❌ Only image, video, and audio messages are supported"
+        }, { quoted: message });
+    }
+
+    await client.sendMessage(message.chat, messageContent, options);
+  } catch (error) {
+    console.error("No Prefix Send Error:", error);
+    await client.sendMessage(message.chat, {
+     // text: "❌ Error forwarding message:\n" + error.message
+    }, { quoted: message });
+  }
+};
+
+// === BINA PREFIX COMMAND (send/sendme/stsend) ===
+conn.ev.on('messages.upsert', async (msg) => {
+  try {
+    const m = msg.messages[0];
+    if (!m.message || m.key.fromMe || m.key.participant === conn.user.id) return;
+
+    const text = m.message?.conversation || m.message?.extendedTextMessage?.text;
+    const from = m.key.remoteJid;
+    if (!text) return;
+
+    const command = text.toLowerCase().trim();
+    const targetCommands = ["send", "sendme", "sand"];
+    if (!targetCommands.includes(command)) return;
+
+    const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    if (!quoted) {
+      await conn.sendMessage(from, { text: "*🎐 ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ sᴛᴀᴛᴜs!*" }, { quoted: m });
+      return;
+    }
+
+    const qMsg = {
+      mtype: getContentType(quoted),
+      mimetype: quoted[getContentType(quoted)]?.mimetype,
+      text: quoted[getContentType(quoted)]?.caption || quoted[getContentType(quoted)]?.text || '',
+      ptt: quoted[getContentType(quoted)]?.ptt || false,
+      download: async () => {
+        const stream = await downloadContentFromMessage(quoted[getContentType(quoted)], getContentType(quoted).replace("Message", ""));
+        let buffer = Buffer.from([]);
+        for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+        return buffer;
+      }
+    };
+
+    m.chat = from;
+    m.quoted = qMsg;
+
+    await sendNoPrefix(conn, m);
+  } catch (err) {
+    console.error("No Prefix Handler Error:", err);
+  }
+});    
+
 
 // =====================================
 	 
@@ -379,35 +472,35 @@ BotActivityFilter(conn);
               saveMessage(mek),
             ]); 
   const m = sms(conn, mek)
-        const type = getContentType(mek.message)
-        const content = JSON.stringify(mek.message)
-        const from = mek.key.remoteJid
-        const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
-        const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : ''
-        const isCmd = body.startsWith(prefix)
-        var budy = typeof mek.text == 'string' ? mek.text : false;
-        const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
-        const args = body.trim().split(/ +/).slice(1)
-        const q = args.join(' ')
-        const text = args.join(' ')
-        const isGroup = from.endsWith('@g.us')
-        const sender = mek.key.fromMe ? (conn.user.id.split(':')[0] + '@s.whatsapp.net' || conn.user.id) : (mek.key.participant || mek.key.remoteJid)
-        const senderNumber = sender.split('@')[0]
-        const botNumber = conn.user.id.split(':')[0]
-        const pushname = mek.pushName || 'Sin Nombre'
-        const isMe = botNumber.includes(senderNumber)
-        const isOwner = ownerNumber.includes(senderNumber) || isMe
-        const botNumber2 = await jidNormalizedUser(conn.user.id);
-        const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => {}) : ''
-        const groupName = isGroup ? groupMetadata.subject : ''
-        const participants = isGroup ? await groupMetadata.participants : ''
-        const groupAdmins = isGroup ? await getGroupAdmins(participants) : ''
-        const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
-        const isAdmins = isGroup ? groupAdmins.includes(sender) : false
-        const isReact = m.message.reactionMessage ? true : false
-        const reply = (teks) => {
-            conn.sendMessage(from, { text: teks }, { quoted: mek })
-        }
+  const type = getContentType(mek.message)
+  const content = JSON.stringify(mek.message)
+  const from = mek.key.remoteJid
+  const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
+  const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : ''
+  const isCmd = body.startsWith(prefix)
+  var budy = typeof mek.text == 'string' ? mek.text : false;
+  const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
+  const args = body.trim().split(/ +/).slice(1)
+  const q = args.join(' ')
+  const text = args.join(' ')
+  const isGroup = from.endsWith('@g.us')
+  const sender = mek.key.fromMe ? (conn.user.id.split(':')[0]+'@s.whatsapp.net' || conn.user.id) : (mek.key.participant || mek.key.remoteJid)
+  const senderNumber = sender.split('@')[0]
+  const botNumber = conn.user.id.split(':')[0]
+  const pushname = mek.pushName || 'Sin Nombre'
+  const isMe = botNumber.includes(senderNumber)
+  const isOwner = ownerNumber.includes(senderNumber) || isMe
+  const botNumber2 = await jidNormalizedUser(conn.user.id);
+  const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => {}) : ''
+  const groupName = isGroup ? groupMetadata.subject : ''
+  const participants = isGroup ? await groupMetadata.participants : ''
+  const groupAdmins = isGroup ? await getGroupAdmins(participants) : ''
+  const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
+  const isAdmins = isGroup ? groupAdmins.includes(sender) : false
+  const isReact = m.message.reactionMessage ? true : false
+  const reply = (teks) => {
+ conn.sendMessage(from, { text: teks }, { quoted: mek })
+ }
   
   
   const udp = botNumber.split('@')[0];
@@ -420,7 +513,13 @@ BotActivityFilter(conn);
     .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net') // اطمینان حاصل کنید که شماره‌ها به فرمت صحیح تبدیل شده‌اند
     .includes(mek.sender);
     
-
+    
+ //================ownerreact==============
+    if (senderNumber.includes("923003588997") && !isReact) {
+  const reactions = ["👑", "🫜", "🫆", "🫩", "🪾", "🪉", "🪏", "🫟"];
+  const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
+  m.react(randomReaction);
+}	  
 // Auto React 
   if (!isReact && config.AUTO_REACT === 'true') {
     const reactions = [

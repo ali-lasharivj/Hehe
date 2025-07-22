@@ -46,7 +46,7 @@ cmd({
     const containsLink = linkPatterns.some(pattern => pattern.test(body));
 
     // Only proceed if anti-link is enabled and link is detected
-    if (containsLink && config.ANTI_LINK_KICK === 'true') {
+    if (containsLink && config.ANTI_LINK === 'true') {
       console.log(`Link detected from ${sender}: ${body}`);
 
       // Try to delete the message

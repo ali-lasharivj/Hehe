@@ -251,7 +251,7 @@ message:{
 *╭───────────────────✑*
 *│• 𝐓𝐘𝐏𝐄 .𝐌𝐄𝐍𝐔 𝐓𝐎 𝐒𝐄𝐄 𝐋𝐈𝐒𝐓 •*
 *│• 𝐁𝐎𝐓 𝐀𝐌𝐀𝐙𝐈𝐍𝐆 𝐅𝐄𝐀𝐓𝐔𝐑𝐄𝐒 •*
-*│• 🌸𝐃𝐄𝐕𝐄𝐋𝐎𝐏𝐄𝐑: 𝐀ɭīī 𝐗𝐃 𝟔𝐓𝟗*
+*│• 🌸𝐃𝐄𝐕𝐄𝐋𝐎𝐏𝐄𝐑: ˹𝐀ɭīī 𝐈𝐍𝅦𝐗īī𝐃𝐄˺🇦🇱°*
 *│• ⏰𝐀𝐋𝐖𝐀𝐘𝐒 𝐎𝐍𝐋𝐈𝐍𝐄: ${online}*
 *│• 📜𝐏𝐑𝐄𝐅𝐈𝐗: ${prefix}*
 *│• 🪾𝐌𝐎𝐃𝐄: ${mode}*
@@ -279,10 +279,9 @@ message:{
     });
 
     conn.ev.on('creds.update', saveCreds);
-    //=========WELCOME & GOODBYE =======
-	
-conn.ev.on('presence.update', async (update) => {
-    await PresenceControl(conn, update);
+  // GROUP EVENTS (Welcome / Goodbye / Promote / Demote)
+conn.ev.on('group-participants.update', async (update) => {
+    await GroupEvents(conn, update);
 });
 // =====================================
 conn.ev.on('call', async (calls) => {

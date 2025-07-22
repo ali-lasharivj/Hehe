@@ -24,7 +24,7 @@ WELCOME: process.env.WELCOME || "true",
 // true if want welcome msg in groups
 GOODBYE: process.env.GOODBYE || "true",
 // true if want goodbye msg in groups 
-ADMIN_EVENTS: process.env.ADMIN_EVENTS || "false",
+ADMIN_ACTION: process.env.ADMIN_ACTION || "false",
 // make true to know who dismiss or promoted a member in group
 ANTI_LINK_KICK: process.env.ANTI_LINK_KICK || "false",
 ANTI_LINK: process.env.ANTI_LINK || "false",

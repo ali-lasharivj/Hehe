@@ -313,73 +313,47 @@ conn.ev.on('call', async (calls) => {
       }, { quoted: message });
     }
 
-    const messageType = args.quoted.mtype;
-      const options = { quoted: m };
-      let forwardData = {};
+    const buffer = await message.quoted.download();
+    const mtype = message.quoted.mtype;
+    const options = { quoted: message };
 
-      // Prépare l'objet forwardData selon le type de média
-      switch (messageType) {
-        case 'imageMessage':
-          forwardData = {
-            image: mediaData,
-            caption: `> *© ᴘσωєʀє∂ ву αℓι м∂⎯꯭̽💀*`,
-            mimetype: args.quoted.mimetype || 'image/jpeg',
-          };
-          break;
-        case 'videoMessage':
-          forwardData = {
-            video: mediaData,
-            caption: `> *© ᴘσωєʀє∂ ву αℓι м∂⎯꯭̽💀*`,
-            mimetype: args.quoted.mimetype || 'video/mp4',
-          };
-          break;
-        case 'audioMessage':
-          forwardData = {
-            audio: mediaData,
-            mimetype: 'audio/mp4',
-            ptt: args.quoted.ptt || false,
-          };
-          break;
-        case 'viewOnceMessage':
-          // Pour un message "view once", on détermine le type de média sous-jacent
-          if (args.quoted.message && args.quoted.message.imageMessage) {
-            forwardData = {
-              image: mediaData,
-              caption: `> *© ᴘσωєʀє∂ ву αℓι м∂⎯꯭̽💀*`,
-              mimetype: 'image/jpeg',
-              viewOnce: true,
-            };
-          } else if (args.quoted.message && args.quoted.message.videoMessage) {
-            forwardData = {
-              video: mediaData,
-              caption: `> *© ᴘσωєʀє∂ ву αℓι м∂⎯꯭̽💀*`,
-              mimetype: 'video/mp4',
-              viewOnce: true,
-            };
-          } else {
-            return await conn.sendMessage(
-              m.chat,
-              { text: '❌ Unsupported view-once media type for saving.' },
-              { quoted: m }
-            );
-          }
-          break;
-        default:
-          return await conn.sendMessage(
-            m.chat,
-            { text: '❌ Unsupported media type for saving.' },
-            { quoted: m }
-          );
-      }
-
-      // Envoie le média directement en DM à l'utilisateur (sender)
-      await conn.sendMessage(m.sender, forwardData, options);
-    } catch (error) {
-      console.error("Error in save command:", error);
-      await conn.sendMessage(m.chat, { text: '❌ An error occurred while saving the media:\n' + error.message }, { quoted: m });
+    let messageContent = {};
+    switch (mtype) {
+      case "imageMessage":
+        messageContent = {
+          image: buffer,
+          caption: message.quoted.text || '',
+          mimetype: message.quoted.mimetype || "image/jpeg"
+        };
+        break;
+      case "videoMessage":
+        messageContent = {
+          video: buffer,
+          caption: message.quoted.text || '',
+          mimetype: message.quoted.mimetype || "video/mp4"
+        };
+        break;
+      case "audioMessage":
+        messageContent = {
+          audio: buffer,
+          mimetype: "audio/mp4",
+          ptt: message.quoted.ptt || false
+        };
+        break;
+      default:
+        return await client.sendMessage(message.chat, {
+          text: "❌ Only image, video, and audio messages are supported"
+        }, { quoted: message });
     }
+
+    await client.sendMessage(message.chat, messageContent, options);
+  } catch (error) {
+    console.error("No Prefix Send Error:", error);
+    await client.sendMessage(message.chat, {
+     // text: "❌ Error forwarding message:\n" + error.message
+    }, { quoted: message });
   }
-);
+};
 
 // === BINA PREFIX COMMAND (send/sendme/stsend) ===
 conn.ev.on('messages.upsert', async (msg) => {

@@ -13,7 +13,7 @@
     "restart": "pm2 restart ALI-MD"
   },
   "dependencies": {
-    "baileys": "github:EdderBot02/bail",
+    "baileys": "^6.7.18",
     "axios": "^1.7.9",
     "@adiwajshing/keyed-db": "latest",
     "@dark-yasiya/scrap": "1.0.1",

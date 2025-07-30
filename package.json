@@ -13,7 +13,7 @@
     "restart": "pm2 restart ALI-MD"
   },
   "dependencies": {
-    "baileys": "npm:baileys@6.7.18",
+    "baileys": "npm:@faouzkk/baileys@3.0.0",
     "axios": "^1.7.9",
     "@adiwajshing/keyed-db": "latest",
     "@dark-yasiya/scrap": "1.0.1",

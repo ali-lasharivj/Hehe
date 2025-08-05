@@ -14,7 +14,7 @@ cmd({
   sender
 }) => {
   try {
-    const badWords = ["wtf", "mia", "porn", "xxx", "fuck", 'sex', "huththa", "boobs", 'porn', "sexy"];
+    const badWords = ["wtf", "mia", "xxx", "fuck", 'sex', "huththa", "pakaya", 'ponnaya', "hutto"];
 
     if (!isGroup || isAdmins || !isBotAdmins) {
       return;
@@ -23,7 +23,7 @@ cmd({
     const messageText = body.toLowerCase();
     const containsBadWord = badWords.some(word => messageText.includes(word));
 
-    if (containsBadWord && config.ANTI_BAD_WORD === "true") {
+    if (containsBadWord && config.ANTI_BAD_WORD === 'true') {
       await conn.sendMessage(from, { 'delete': m.key }, { 'quoted': m });
       await conn.sendMessage(from, { 'text': "*⚠️ вα∂ ωσя∂ѕ иσт αℓℓσωє∂ 🚫*" }, { 'quoted': m });
     }
@@ -35,23 +35,28 @@ cmd({
 
 // Anti-Link System
 const linkPatterns = [
-      /https?:\/\/(?:chat\.whatsapp\.com|wa\.me)\/\S+/gi, // WhatsApp links
-      /https?:\/\/(?:api\.whatsapp\.com|wa\.me)\/\S+/gi, 
-      /^https?:\/\/(www\.)?whatsapp\.com\/channel\/([a-zA-Z0-9_-]+)$/,
-      /https?:\/\/(?:www\.)?youtube\.com\/\S+/gi,  // WhatsApp API links
-      /wa\.me\/\S+/gi,                             // WhatsApp.me links
-      /https?:\/\/(?:t\.me|telegram\.me)\/\S+/gi,         // Telegram links
-      /https?:\/\/(?:www\.)?\.com\/\S+/gi,                // Generic .com links
-      /https?:\/\/(?:www\.)?twitter\.com\/\S+/gi,         // Twitter links
-      /https?:\/\/(?:www\.)?linkedin\.com\/\S+/gi,        // LinkedIn links
-      /https?:\/\/(?:whatsapp\.com|channel\.me)\/\S+/gi,  // Other WhatsApp/channel links
-      /https?:\/\/(?:www\.)?reddit\.com\/\S+/gi,          // Reddit links
-      /https?:\/\/(?:www\.)?discord\.com\/\S+/gi,         // Discord links
-      /https?:\/\/(?:www\.)?twitch\.tv\/\S+/gi,           // Twitch links
-      /https?:\/\/(?:www\.)?vimeo\.com\/\S+/gi,           // Vimeo links
-      /https?:\/\/(?:www\.)?dailymotion\.com\/\S+/gi,     // Dailymotion links
-      /https?:\/\/(?:www\.)?medium\.com\/\S+/gi           // Medium links
-    ];
+  /https?:\/\/(?:chat\.whatsapp\.com|wa\.me)\/\S+/gi,
+  /^https?:\/\/(www\.)?whatsapp\.com\/channel\/([a-zA-Z0-9_-]+)$/,
+  /wa\.me\/\S+/gi,
+  /https?:\/\/(?:t\.me|telegram\.me)\/\S+/gi,
+  /https?:\/\/(?:www\.)?youtube\.com\/\S+/gi,
+  /https?:\/\/youtu\.be\/\S+/gi,
+  /https?:\/\/(?:www\.)?facebook\.com\/\S+/gi,
+  /https?:\/\/fb\.me\/\S+/gi,
+  /https?:\/\/(?:www\.)?instagram\.com\/\S+/gi,
+  /https?:\/\/(?:www\.)?twitter\.com\/\S+/gi,
+  /https?:\/\/(?:www\.)?tiktok\.com\/\S+/gi,
+  /https?:\/\/(?:www\.)?linkedin\.com\/\S+/gi,
+  /https?:\/\/(?:www\.)?snapchat\.com\/\S+/gi,
+  /https?:\/\/(?:www\.)?pinterest\.com\/\S+/gi,
+  /https?:\/\/(?:www\.)?reddit\.com\/\S+/gi,
+  /https?:\/\/ngl\/\S+/gi,
+  /https?:\/\/(?:www\.)?discord\.com\/\S+/gi,
+  /https?:\/\/(?:www\.)?twitch\.tv\/\S+/gi,
+  /https?:\/\/(?:www\.)?vimeo\.com\/\S+/gi,
+  /https?:\/\/(?:www\.)?dailymotion\.com\/\S+/gi,
+  /https?:\/\/(?:www\.)?medium\.com\/\S+/gi
+];
 
 cmd({
   'on': "body"
@@ -71,7 +76,7 @@ cmd({
 
     const containsLink = linkPatterns.some(pattern => pattern.test(body));
 
-    if (containsLink && config.ANTI_LINK_KICK === 'true') {
+    if (containsLink && config.ANTI_LINK === 'true') {
       await conn.sendMessage(from, { 'delete': m.key }, { 'quoted': m });
       await conn.sendMessage(from, {
         'text': `*⌈⚠️ ℓιɴк ∂єтє¢тє∂ ⌋*\n*╭────────────────┄┈┈*\n*│🫩 σᴜт:* @${participant.split("@")[0]}

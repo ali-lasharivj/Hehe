@@ -1,7 +1,4 @@
 const fs = require('fs');
-const path = require('path');
-const { getConfig } = require("./lib/configdb");
-
 if (fs.existsSync('config.env')) require('dotenv').config({ path: './config.env' });
 
 function convertToBool(text, fault = 'true') {
@@ -9,8 +6,6 @@ function convertToBool(text, fault = 'true') {
 }
 module.exports = {
 SESSION_ID: process.env.SESSION_ID || "",  
-//chatbot integration 
-CHATBOT: getConfig("CHATBOT") || "on",
 // add your Session Id 
 AUTO_STATUS_SEEN: process.env.AUTO_STATUS_SEEN || "true",
 // make true or false status auto seen
@@ -20,27 +15,24 @@ AUTO_STATUS_REACT: process.env.AUTO_STATUS_REACT || "true",
 // make true if you want auto reply on status 
 AUTO_STATUS_MSG: process.env.AUTO_STATUS_MSG || "*SEEN YOUR STATUS JUST NOW ALI-MD 👻*",
 // set the auto reply massage on status reply  
-WELCOME: process.env.WELCOME || "false",
+WELCOME: process.env.WELCOME || "true",
 // true if want welcome msg in groups
-GOODBYE: process.env.GOODBYE || "false",
+GOODBYE: process.env.GOODBYE || "true",
 // true if want goodbye msg in groups 
-ADMIN_ACTION: process.env.ADMIN_ACTION || "true",
+ADMIN_EVENTS: process.env.ADMIN_ACTION || "false",
 // make true to know who dismiss or promoted a member in group
-ANTI_LINK_KICK: process.env.ANTI_LINK_KICK || "true",
 ANTI_LINK: process.env.ANTI_LINK || "false",
-ANTI_LINK_WARN: process.env.ANTI_LINK_WARN || "false",
-ANTI_LINK_DELETE: process.env.ANTI_LINK_DELETE || "false",
 // make anti link true,false for groups
-ANTI_CALL: getConfig("ANTI_CALL") || "true",
+ANTI_CALL: process.env.ANTI_CALL || "true",
 REJECT_MSG: process.env.REJECT_MSG || "*📞 ᴄαℓℓ ɴσт αℓℓσωє∂ ιɴ тнιѕ ɴᴜмвєʀ уσυ ∂σɴт нανє ᴘєʀмιѕѕισɴ 📵*",
 // make anti link true,false for groups 
 MENTION_REPLY: process.env.MENTION_REPLY || "false",
 // make true if want auto voice reply if someone menetion you 
-ALIVE_IMG: getConfig("ALIVE_IMG") || "https://qu.ax/zrqFX.jpg",
+ALIVE_IMG: process.env.ALIVE_IMG || "https://qu.ax/zrqFX.jpg",
 // add custom menu image url
-PREFIX: getConfig("PREFIX") || ",", 
+PREFIX: process.env.PREFIX || ".", 
 // add your prifix for bot   
-BOT_NAME: getConfig("BOT_NAME") || "ALI-MD",
+BOT_NAME: process.env.BOT_NAME || "ALI-MD",
 // add bot namw here for menu
 STICKER_NAME: process.env.STICKER_NAME || "ALI-MD",    
 VPS: process.env.VPS || "",
@@ -55,8 +47,6 @@ OWNER_NUMBER: process.env.OWNER_NUMBER || "923003588997",
 OWNER_NAME: process.env.OWNER_NAME || "ALI INXIDE",
 // add bot owner name
 DESCRIPTION: process.env.DESCRIPTION || "© ᴘσωєʀє∂ ву αℓι м∂⎯꯭̽💀",
-// add bot desp name    
-LIVE_MSG: process.env.LIVE_MSG || "HEY IM ALIVE",
 // add alive msg here 
 READ_MESSAGE: process.env.READ_MESSAGE || "false",
 // Turn true or false for automatic read msgs
@@ -65,7 +55,7 @@ AUTO_REACT: process.env.AUTO_REACT || "false",
 ANTI_BAD_WORD: process.env.ANTI_BAD_WORD || "false",
 // false or true for anti bad words 
 ANTI_BOT: process.env.ANTI_BOT || "true",
-MODE: getConfig("MODE") || "public",
+MODE: process.env.MODE || "public",
 // make bot public-private-inbox-group 
 ANTIVIEW_ONCE: process.env.ANTIVIEW_ONCE || "off",
 AUTO_VOICE: process.env.AUTO_VOICE || "false",
